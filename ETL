@@ -1,0 +1,112 @@
+import simfin as sf
+from simfin.names import *
+import pandas as pd
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# ============================
+# Step 1: Extract Data from SimFin
+# ============================
+def load_data():
+    """Loads daily share prices for all US companies from SimFin."""
+    sf.set_api_key('a41304bb-40b3-4501-8b1c-e14abdd7a133') # Use your API key if required
+    sf.set_data_dir('~/simfin_data/')  # Set SimFin data directory
+    
+    print(" Downloading US stock market data...")
+    df_prices = sf.load_shareprices(market='us', variant='daily')
+
+    # Save extracted data to CSV
+    df_prices.to_csv("us_share_prices.csv", index=False)
+    print(" Data saved to 'us_share_prices.csv'")
+
+    return df_prices
+
+
+# ============================
+# Step 2: Transform Data
+# ============================
+def transform_stock_data(df_prices, ticker='MSFT'):
+    """Processes stock price data for a given ticker and prepares ML features."""
+    
+    # Reset multi-index if needed
+    df_prices = df_prices.reset_index()
+
+    # Ensure 'Date' is in datetime format
+    df_prices['Date'] = pd.to_datetime(df_prices['Date'])
+
+    # Filter for the specific ticker and select relevant columns
+    df_filtered = df_prices[df_prices['Ticker'] == ticker][['Date', 'Close']]
+    
+    # Set Date as index
+    df_filtered.set_index('Date', inplace=True)
+    
+    # Create Target Column (1 if price rises, 0 if it falls)
+    df_filtered['Next_Close'] = df_filtered['Close'].shift(-1)
+    df_filtered['Target'] = (df_filtered['Next_Close'] > df_filtered['Close']).astype(int)
+    
+    # Feature Engineering
+    df_filtered['Daily_Return'] = df_filtered['Close'].pct_change().fillna(0)
+    df_filtered['MA_5'] = df_filtered['Close'].rolling(window=5).mean().fillna(0)
+    df_filtered['MA_10'] = df_filtered['Close'].rolling(window=10).mean().fillna(0)
+
+    # Drop NaN values
+    df_filtered.dropna(inplace=True)
+
+    return df_filtered
+
+# ============================
+# Step 3: Train ML Model
+# ============================
+def train_model(df):
+    """Trains a logistic regression model to predict price movement."""
+    
+    # Define Features (X) and Target (y)
+    X = df[['Close', 'Daily_Return', 'MA_5', 'MA_10']]
+    y = df['Target']
+
+    # Split into Train and Test sets (80% training, 20% testing)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False, random_state=42)
+
+    # Standardize the features
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    # Train Logistic Regression Model
+    model = LogisticRegression()
+    model.fit(X_train_scaled, y_train)
+
+    # Predictions
+    y_pred = model.predict(X_test_scaled)
+
+    # Evaluate Model Performance
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    conf_matrix = confusion_matrix(y_test, y_pred)
+
+    return accuracy, conf_matrix, report
+
+# ============================
+# Main Execution
+# ============================
+if __name__ == "__main__":
+    try:
+        # Load dataset from SimFin
+        df_prices = load_data()
+
+        # Transform MSFT data
+        df_msft = transform_stock_data(df_prices, 'MSFT')
+
+        # Train ML model and evaluate
+        accuracy, conf_matrix, report = train_model(df_msft)
+
+        # Print evaluation results
+        print(f" Model Accuracy: {accuracy:.2%}")
+        print("\n🔹 Classification Report:\n", report)
+        print("\n🔹 Confusion Matrix:\n", conf_matrix)
+
+    except Exception as e:
+        print(f" Error: {e}")
