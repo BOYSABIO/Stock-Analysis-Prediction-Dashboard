@@ -79,7 +79,7 @@ try:
             sentiment = article.get("sentiment", "neutral")  # Optional: default fallback
 
             # Sentiment coloring (mock logic for now, Finnhub doesn’t give direct sentiment for news)
-            if "crash" in summary.lower() or "lawsuit" in summary.lower() or "down" in summary.lower():
+            if "crash" in summary.lower() or "lawsuit" in summary.lower() or "down" in summary.lower() or 'threat' in summary.lower():
                 color = "red"
             elif "growth" in summary.lower() or "profit" in summary.lower() or "up" in summary.lower():
                 color = "green"
