@@ -18,10 +18,10 @@ st.set_page_config(
 )
 
 # HEADER SECTION
-st.title("Automated Stock Trading Dashboard")
+st.title("Stock Trading Dashboard")
 st.markdown("""
-This dashboard allows you to select a stock, view historical data, model predictions,
-and trading recommendations. You can also explore the underlying model code and insights.
+Select a stock from the dropdown menu, view historical data, model predictions,
+and trading recommendations. You can also explore the underlying model code and insights by selecting the dropdown.
 """)
 
 # STOCK SELECTOR SECTION
@@ -38,8 +38,8 @@ st.markdown("### Stock Snapshot")
 col1, col2, col3 = st.columns([2, 1, 1])
 with col1:
     st.subheader(f"{ticker} - Example Corp")
-    st.caption("Exchange: NASDAQ")
-    st.markdown("Sector: **Technology**")
+    st.caption("**Exchange**: NASDAQ")
+    st.caption("**Sector**: Technology")
 
 with col2:
     st.metric("Current Price", "$391.50", "+0.06%")
