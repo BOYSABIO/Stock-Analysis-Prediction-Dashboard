@@ -35,7 +35,7 @@ ticker = selected_ticker
 
 # News & Sentiment Score
 # Wordlist
-positive_words = ["gain", "rise", "growth", "profit", "up", "record", "soar"]
+positive_words = ["gain", "rise", "growth", "profit", "up", "record", "soar", "good"]
 negative_words = ["fall", "loss", "drop", "lawsuit", "down", "cut", "decline", "crash", "threat"]
 
 finnhub_client = finnhub.Client(api_key=FINNHUB_API_KEY) 
@@ -121,7 +121,7 @@ fig = go.Figure()
 fig.add_trace(go.Scatter(x=df.index, y=df["Close"], mode='lines', name='Price'))
 fig.add_trace(go.Scatter(x=df.index, y=df['MA20'], mode='lines', name='20-Day MA', line=dict(color='orange', dash='dot')))
 fig.add_trace(go.Scatter(x=df.index, y=df['MA50'], mode='lines', name='50-Day MA', line=dict(color='green', dash='dash')))
-fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', yaxis='y2'))
+fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', yaxis='y2', opacity=0.5))
 
 fig.update_layout(yaxis2=dict(title="Volume", overlaying='y', side='right'),legend=dict(orientation="h"))
 fig.update_layout(title=f"Price Movement for {ticker}", xaxis_title="Date", yaxis_title="Price")

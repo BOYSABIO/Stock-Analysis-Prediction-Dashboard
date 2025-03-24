@@ -15,7 +15,7 @@ def get_stock_snapshot(ticker):
     response = requests.get(url, headers=headers).json()
     json_data = response[0]
     df = pd.DataFrame(json_data['data'], columns=json_data['columns'])
-    latest = df.tail(2)
+    latest = df.tail(2).copy()
     latest['% change'] = latest['Last Closing Price'].pct_change()
     latest['change'] = latest['Last Closing Price'].diff()
     return latest.tail(1)
