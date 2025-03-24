@@ -62,7 +62,11 @@ col7.metric("Day Range", "$382.80 - $391.74")
 import finnhub
 import datetime
 
-finnhub_client = finnhub.Client(api_key=FINNHUB_API_KEY)  # Or hardcoded key for testing
+# Wordlist
+positive_words = ["gain", "rise", "growth", "profit", "up", "record", "soar"]
+negative_words = ["fall", "loss", "drop", "lawsuit", "down", "cut", "decline", "crash", "threat"]
+
+finnhub_client = finnhub.Client(api_key=FINNHUB_API_KEY) 
 
 st.sidebar.subheader("Latest News Headlines")
 
@@ -73,43 +77,38 @@ try:
     news = finnhub_client.company_news(ticker, _from=last_week.strftime('%Y-%m-%d'), to=today.strftime('%Y-%m-%d'))
 
     if isinstance(news, list) and len(news) > 0:
+        pos, neg = 0, 0
+
         for article in news[:5]:
             headline = article.get("headline", "")
             summary = article.get("summary", "")
-            sentiment = article.get("sentiment", "neutral")  # Optional: default fallback
+            full_text = (headline + " " + summary).lower()
 
-            # Sentiment coloring (mock logic for now, Finnhub doesn’t give direct sentiment for news)
-            if "crash" in summary.lower() or "lawsuit" in summary.lower() or "down" in summary.lower() or 'threat' in summary.lower():
+            if any(word in full_text for word in negative_words):
                 color = "red"
-            elif "growth" in summary.lower() or "profit" in summary.lower() or "up" in summary.lower():
+                neg += sum(word in full_text for word in negative_words)
+            elif any(word in full_text for word in positive_words):
                 color = "green"
+                pos += sum(word in full_text for word in positive_words)
             else:
                 color = "gray"
 
             st.sidebar.markdown(f":{color}[**{headline}**]")
             st.sidebar.caption(f"{article['source']} | {datetime.datetime.fromtimestamp(article['datetime']).strftime('%Y-%m-%d')}")
             st.sidebar.write("---")
+
+        total_mentions = pos + neg
+        if total_mentions > 0:
+            sentiment_score = (pos / total_mentions) * 100
+            st.sidebar.metric("Custom Sentiment Score", f"{sentiment_score:.1f}% Positive")
+        else:
+            st.sidebar.info("Sentiment analysis not available.")
+
     else:
         st.sidebar.info("No recent news found for this stock.")
 
 except Exception as e:
     st.sidebar.warning(f"Error fetching news: {e}")
-
-positive_words = ["gain", "rise", "growth", "profit", "up", "record", "soar"]
-negative_words = ["fall", "loss", "drop", "lawsuit", "down", "cut", "decline"]
-
-pos, neg = 0, 0
-for article in news:
-    text = (article.get("headline", "") + " " + article.get("summary", "")).lower()
-    pos += sum(word in text for word in positive_words)
-    neg += sum(word in text for word in negative_words)
-
-if pos + neg > 0:
-    sentiment_score = (pos / (pos + neg)) * 100
-    st.sidebar.metric("Custom Sentiment Score", f"{sentiment_score:.1f}% Positive")
-else:
-    st.sidebar.info("Sentiment analysis not available.")
-
 
 # COMPANY INFO 
 st.info(f"**Company Name:** Example Corp\n\n**Industry:** Technology\n\n**Employees:** 10,000\n\n**P/E Ratio:** 24.5")
