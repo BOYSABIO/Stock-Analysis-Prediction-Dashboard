@@ -26,7 +26,7 @@ and trading recommendations. You can also explore the underlying model code and 
 
 # STOCK SELECTOR SECTION
 st.sidebar.header("Select Stock")
-predefined_tickers = ["AAPL", "MSFT", "GOOG", "TSLA", "AMZN"]
+predefined_tickers = ["AAPL", "MSFT", "GOOG", "TSLA", "AMZN", "CRWD"]
 selected_ticker = st.sidebar.selectbox("Choose a ticker:", predefined_tickers)
 
 ticker = selected_ticker
