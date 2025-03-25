@@ -1,5 +1,6 @@
 *.env
 *.csv
 *.xlsx
-test.ipynb
-*__pycache__/
+brainstorm.ipynb
+__pycache__/
+archive/
