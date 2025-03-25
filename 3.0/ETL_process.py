@@ -229,19 +229,12 @@ def enrich_data(df_merged):
     # Moving Averages (MA_5, MA_10) → 5-day and 10-day moving averages for trend detection.
     # Log Returns (Log_Returns) → Helps in normalizing price data for time series models.
     """
-    df_merged["Date"] = pd.to_datetime(df_merged["Date"])  # ensure Date is datetime
-
-    # Sort by Ticker and Date
-    df_merged = df_merged.sort_values(by=["Ticker", "Date"], ascending=[True, True])
-    
     #Creating Price Change %
     df_merged["Price Change %"] = df_merged["Close"].pct_change() * 100  # Use correct column name
-    #Creating Future Price Change %
-    df_merged["Future_Price_Change%"] = (df_merged["Close"].shift(-1)/df_merged["Close"]) -1 * 100  
-
 
     # Handling Null Values: Since .pct_change() creates NaN values for the first row, fill them:
     df_merged["Price Change %"].fillna(0, inplace=True)
+    df_merged["Target"].fillna(0, inplace=True)
     df_merged.head()
 
     # Weekday column
@@ -274,8 +267,6 @@ def enrich_data(df_merged):
     # Save enriched dataset
     os.makedirs("data/ENRICH", exist_ok=True)
     df_merged.to_csv("data/ENRICH/merged_stock_income.csv", index=True) 
-    predefined_tickers = ["AAPL", "MSFT", "GOOG", "TSLA", "AMZN", "CRWD", "PG"]
-    df_merged[df_merged['Ticker'].isin(predefined_tickers)].to_csv("data/ENRICH/selected_merged_stock_income.csv", index=True)
     return df_merged  
     
     

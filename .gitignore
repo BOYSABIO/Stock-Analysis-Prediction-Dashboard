@@ -1,3 +1,5 @@
 *.env
 *.csv
 *.xlsx
+test.ipynb
+*__pycache__/
