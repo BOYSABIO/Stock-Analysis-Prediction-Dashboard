@@ -14,10 +14,11 @@
 
 This streamlit application is an interactive dashboard that allows:
 
-- Real-time and historical stock analysis  
-- Predictive modeling using Logistic Regression and LSTM  
-- Backtesting of multiple trading strategies  
-- Company news sentiment analysis  
+- Analyzes real-time and historical stock price market trends 
+- Provides a sentiment analysis on recent news in the last week about the stock 
+- Predicts whether a stock's price will rise or fall the next day (classification)
+- Forecasts actual future prices using time series models (regression)
+- Simulates investment strategies based on model outputs
 
 It combines ETL pipelines, feature engineering, and ML models using Streamlit.
 
