@@ -4,3 +4,4 @@
 brainstorm.ipynb
 __pycache__/
 archive/
+.venv/

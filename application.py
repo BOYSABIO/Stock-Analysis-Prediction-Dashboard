@@ -7,7 +7,7 @@ import datetime
 import finnhub 
 import os
 from dotenv import load_dotenv
-from streamlit_functions import *
+from stock_snapshot import *
 
 load_dotenv()
 FINNHUB_API_KEY = os.getenv('FINNHUB_API_KEY')
